@@ -1,0 +1,14 @@
+
+spring:
+  jpa:
+    show-sql: false
+  devtools:
+    add-properties: false
+
+
+logging:
+  level:
+    org:
+      springframework:
+        web : ERROR
+        security: ERROR

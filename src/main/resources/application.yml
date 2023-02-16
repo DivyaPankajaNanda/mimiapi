@@ -1,0 +1,29 @@
+MIMI_AUTH_SECRET_KEY : ${MIMI_AUTH_SECRET_KEY}
+MIMI_TOKEN_EXPIRATION_DURATION : 36000000
+MIMI_DB_URL: ${MIMI_DB_URL}
+MIMI_DB_USERNAME : ${MIMI_DB_USERNAME}
+MIMI_DB_PASSWORD : ${MIMI_DB_PASSWORD}
+MIMIAPI_V1_PREFIX : mimiapi/v1
+
+server:
+    port: 9000
+
+spring:
+  profiles:
+    include: default
+    active: dev
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: update
+  datasource:
+    platform: postgres
+    url: ${MIMI_DB_URL}
+    username: ${MIMI_DB_USERNAME}
+    password: ${MIMI_DB_PASSWORD}
+    driverClassName: org.postgresql.Driver
+
+springdoc:
+    swagger-ui:
+        path: /swagger.html
+        

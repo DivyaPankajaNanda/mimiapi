@@ -1,0 +1,13 @@
+
+spring:
+  jpa:
+    show-sql: true
+  devtools:
+    add-properties: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web : TRACE
+        security: TRACE
