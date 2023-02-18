@@ -11,6 +11,6 @@ public class LocaleConfig {
 
     @PostConstruct
     public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("IST"));
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 }
