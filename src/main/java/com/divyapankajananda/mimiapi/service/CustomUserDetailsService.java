@@ -25,11 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService{
     }
 
     public Boolean userExists(String username){
-        Optional<User> user = userRepository.findByUsername(username);
-        if(user.isPresent())
-            return true;
-        else
-            return false;
+        return userRepository.existsByUsername(username);
     }
 
 }
