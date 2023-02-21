@@ -16,7 +16,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.divyapankajananda.mimiapi.dto.CustomExceptionDto;
-import com.divyapankajananda.mimiapi.exception.DuplicateUserException;
+import com.divyapankajananda.mimiapi.exception.ForbiddenActionException;
+import com.divyapankajananda.mimiapi.exception.ResourceNotFoundException;
 
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
@@ -45,8 +46,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    @ExceptionHandler({ DuplicateUserException.class })
-    protected ResponseEntity<Object> handleDuplicateUserException(DuplicateUserException ex, WebRequest request) {
+    @ExceptionHandler({ ForbiddenActionException.class })
+    protected ResponseEntity<Object> handleForbiddenException(ForbiddenActionException ex, WebRequest request) {
         CustomExceptionDto exception = CustomExceptionDto.builder()
                 .message(ex.getLocalizedMessage())
                 .build();
@@ -54,6 +55,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(exception);
 
     }
+
+    @ExceptionHandler({ ResourceNotFoundException.class })
+    protected ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        CustomExceptionDto exception = CustomExceptionDto.builder()
+                .message(ex.getLocalizedMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(exception);
+
+    }
+
 
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {

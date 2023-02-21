@@ -44,6 +44,7 @@ public class SecurityConfig {
             .anonymous()
             .and()
             .authorizeHttpRequests()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/mimiapi/v1/auth/signup").permitAll()
             .requestMatchers(HttpMethod.POST, "/mimiapi/v1/auth/signin").permitAll()
             .requestMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()
