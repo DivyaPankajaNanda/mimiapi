@@ -1,5 +1,8 @@
 package com.divyapankajananda.mimiapi.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.divyapankajananda.mimiapi.dto.JwtTokenDto;
 import com.divyapankajananda.mimiapi.dto.SigninRequestDto;
 import com.divyapankajananda.mimiapi.dto.SignupRequestDto;
+import com.divyapankajananda.mimiapi.dto.UserDtoMapper;
+import com.divyapankajananda.mimiapi.dto.UserResponseDto;
 import com.divyapankajananda.mimiapi.entity.User;
 import com.divyapankajananda.mimiapi.repository.UserRepository;
 
@@ -28,6 +33,9 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserDtoMapper userDtoMapper;
 
     public JwtTokenDto signin(SigninRequestDto signinRequestDto) {
 
@@ -60,6 +68,17 @@ public class AuthService {
 
         userRepository.save(user);
 
+    }
+
+    public UserResponseDto userProfile(UUID userId){
+        Optional<User> user = userRepository.findById(userId);
+
+        if(!user.isPresent()){
+            throw new UsernameNotFoundException("Invalid credentials");
+        }
+
+        UserResponseDto userResponseDto = userDtoMapper.toUserResponseDto(user.get());
+        return userResponseDto;
     }
 
 }
