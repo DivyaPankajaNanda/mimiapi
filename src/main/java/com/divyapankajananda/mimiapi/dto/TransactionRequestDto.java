@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PaymentRequestDto {
+public class TransactionRequestDto {
     
     @NotBlank(message = "Invalid Payment title")
     private String title;

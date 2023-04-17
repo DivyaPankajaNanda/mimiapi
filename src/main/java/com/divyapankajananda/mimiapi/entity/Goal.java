@@ -61,6 +61,9 @@ public class Goal {
 
     @Column(name="end_date", nullable = false)
     private LocalDate endDate;
+
+    @Column(name="completed", nullable = false)
+    private boolean completed;
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

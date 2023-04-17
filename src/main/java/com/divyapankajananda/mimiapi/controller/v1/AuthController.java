@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +24,6 @@ import com.divyapankajananda.mimiapi.service.CustomUserDetailsService;
 import jakarta.validation.Valid;
 
 @RestController
-@EnableMethodSecurity
 @RequestMapping("mimiapi/v1/auth")
 public class AuthController {
 
@@ -57,7 +53,7 @@ public class AuthController {
         }
     }
    
-    @PostMapping("/user")
+    @PostMapping("/me")
     public ResponseEntity<Object> userProfile() {
         UUID currentUserId = auditor.getCurrentAuditor().get();
         UserResponseDto userResponseDto = authService.userProfile(currentUserId);

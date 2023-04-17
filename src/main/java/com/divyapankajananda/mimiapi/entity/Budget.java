@@ -35,14 +35,23 @@ public class Budget {
     @Column(name="total_budget", nullable = false)
     private Double totalBudget;
 
-    @Column(name="invstment_budget", nullable = false)
-    private Double invstmentBudget;
+    @Column(name="investment_budget", nullable = false)
+    private Double investmentBudget;
 
     @Column(name="expense_budget", nullable = false)
     private Double expenseBudget;
 
     @Column(name="saving_budget", nullable = false)
     private Double savingBudget;
+
+    @Column(name="investment_amount", nullable = false)
+    private Double investmentAmount;
+
+    @Column(name="expense_mount", nullable = false)
+    private Double expenseAmount;
+
+    @Column(name="saving_amount", nullable = false)
+    private Double savingAmount;
 
     @Column(name="currency", nullable = false)
     private String currency;

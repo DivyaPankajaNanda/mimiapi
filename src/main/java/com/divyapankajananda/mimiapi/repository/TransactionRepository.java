@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.divyapankajananda.mimiapi.entity.Payment;
+import com.divyapankajananda.mimiapi.entity.Transaction;
 
-public interface PaymentRepository extends JpaRepository<Payment, UUID> {
-    Page<Payment> findAllByUserId(UUID userId, Pageable pageable);
+public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
+    Page<Transaction> findAllByUserId(UUID userId, Pageable pageable);
 }

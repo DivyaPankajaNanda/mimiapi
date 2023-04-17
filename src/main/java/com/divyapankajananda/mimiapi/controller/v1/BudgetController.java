@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +61,20 @@ public class BudgetController {
         UUID currentUserId = auditor.getCurrentAuditor().get();
         Optional<List<Budget>> budgets = budgetService.findAllUserBudgetsBetweenStartAndEndDate(startDate, endDate,
                 currentUserId);
+
+        if(!budgets.isPresent() || budgets.get().size()<=0){
+            throw new ResourceNotFoundException("No budget found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(budgets.get());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> findAllBudgets() throws ResourceNotFoundException {
+
+        UUID currentUserId = auditor.getCurrentAuditor().get();
+        Optional<List<Budget>> budgets = budgetService.findAllUserBudgets(currentUserId);
 
         if(!budgets.isPresent() || budgets.get().size()<=0){
             throw new ResourceNotFoundException("No budget found");

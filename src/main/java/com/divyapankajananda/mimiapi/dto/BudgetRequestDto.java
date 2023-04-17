@@ -26,7 +26,7 @@ public class BudgetRequestDto {
 
     @DecimalMin(value = "0.0", message = "Invalid investment budget")
     @NotNull
-    private Double invstmentBudget;
+    private Double investmentBudget;
 
     @DecimalMin(value = "0.0", message = "Invalid expense budget")
     @NotNull
@@ -35,6 +35,18 @@ public class BudgetRequestDto {
     @DecimalMin(value = "0.0", message = "Invalid saving budget")
     @NotNull
     private Double savingBudget;
+
+    @DecimalMin(value = "0.0", message = "Invalid investment amount")
+    @NotNull
+    private Double investmentAmount;
+
+    @DecimalMin(value = "0.0", message = "Invalid expense amount")
+    @NotNull
+    private Double expenseAmount;
+
+    @DecimalMin(value = "0.0", message = "Invalid saving amount")
+    @NotNull
+    private Double savingAmount;
 
     @NotBlank(message = "Invalid currency")
     private String currency;

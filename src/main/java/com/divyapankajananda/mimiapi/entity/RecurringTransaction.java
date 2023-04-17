@@ -27,8 +27,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "recurring_payment")
-public class RecurringPayment {
+@Table(name = "recurring_transaction")
+public class RecurringTransaction {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

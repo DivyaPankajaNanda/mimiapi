@@ -6,9 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.divyapankajananda.mimiapi.dto.BudgetDtoMapper;
@@ -36,6 +33,10 @@ public class BudgetService {
 
     public Optional<List<Budget>> findAllUserBudgetsBetweenStartAndEndDate(LocalDate startDate, LocalDate endDate, UUID currentUserId){
         return budgetRepository.findAllUserBudgetsBetweenStartAndEndDate(startDate, endDate, currentUserId);
+    }
+
+    public Optional<List<Budget>> findAllUserBudgets(UUID currentUserId){
+        return budgetRepository.findAllUserBudgets(currentUserId);
     }
 
     public Optional<Budget> findBudget(UUID budgetid){

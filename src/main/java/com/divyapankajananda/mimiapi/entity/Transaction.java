@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "payment")
-public class Payment {
+@Table(name = "transaction")
+public class Transaction {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
