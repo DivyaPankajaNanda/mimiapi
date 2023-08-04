@@ -66,7 +66,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
         CustomExceptionDto exception = CustomExceptionDto.builder()

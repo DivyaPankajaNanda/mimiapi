@@ -19,7 +19,7 @@ public class SpringSecurityAuditorAware implements AuditorAware<UUID> {
             return Optional.ofNullable(null);
         }
 
-        return Optional.of(((User) authentication.getPrincipal()).getId());
+        return Optional.of(((User) authentication.getPrincipal()).getUserId());
     }
     
 }
