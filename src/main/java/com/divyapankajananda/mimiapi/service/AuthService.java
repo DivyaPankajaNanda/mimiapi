@@ -16,6 +16,7 @@ import com.divyapankajananda.mimiapi.dto.SigninRequestDto;
 import com.divyapankajananda.mimiapi.dto.SignupRequestDto;
 import com.divyapankajananda.mimiapi.dto.UserDtoMapper;
 import com.divyapankajananda.mimiapi.dto.UserResponseDto;
+import com.divyapankajananda.mimiapi.entity.CurrencyType;
 import com.divyapankajananda.mimiapi.entity.User;
 import com.divyapankajananda.mimiapi.repository.UserRepository;
 
@@ -64,6 +65,7 @@ public class AuthService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role("USER")
+                .currency(CurrencyType.RUPEE)
                 .build();
 
         userRepository.save(user);
