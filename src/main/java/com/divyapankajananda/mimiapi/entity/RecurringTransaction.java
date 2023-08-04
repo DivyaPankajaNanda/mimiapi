@@ -4,17 +4,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,36 +38,37 @@ public class RecurringTransaction {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name="id")
-    private UUID id;
+    @Column(name="transaction_id")
+    private UUID transactionId;
     
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
     
-    @Column(name = "description")
+    @Column(name = "description", length = 500)
     private String description;
     
-    @Column(name = "asset_url")
+    @Column(name = "asset_url",length = 250)
     private String assetUrl;
     
     @Column(name = "amount", nullable = false)
     private Double amount;
     
-    // days
-    @Column(name = "frequency", nullable = false)
-    private int frequency;
+    @Column(name = "interval_days", nullable = false)
+    private Integer intervalDays;
     
-    @Column(name = "trigger_date")
+    @Column(name = "trigger_date", nullable = false)
     private LocalDate triggerDate;
     
-    @Column(name = "categoryid", nullable = false)
-    private UUID categoryId;
-    
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    private String type;
+    private TransactionType type;
     
-    @Column(name = "automated", nullable = false)
-    private boolean automated;
+    @Column(name = "is_automated", nullable = false)
+    private boolean isAutomated;
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -71,9 +78,9 @@ public class RecurringTransaction {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @CreatedBy
-    @Column(name="userid", nullable = false, updatable = false)
-    private UUID userId;
-    
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id", nullable = false, updatable = false)
+    private User user;
 
 }

@@ -2,6 +2,7 @@ package com.divyapankajananda.mimiapi.entity;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,8 +37,8 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
-    private UUID id;
+    @Column(name = "user_id")
+    private UUID userId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -49,13 +52,20 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="currency", length = 50, nullable = false)
+    private CurrencyType currency;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        if(role == null)
+            return Collections.emptyList();
+        else
+            return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

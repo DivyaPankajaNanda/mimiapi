@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,19 +21,14 @@ public class Icon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="id")
-    private Long id;
+    @Column(name="icon_id")
+    private Long iconId;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "url", nullable = false)
-    private String url;
-
-    @OneToOne(mappedBy = "icon")
-    private Category category;
-
-    @OneToOne(mappedBy = "icon")
-    private CustomCategory customCategory;
+    // fa fa-icons
+    @Column(name = "icon_element", nullable = false)
+    private String iconElement;
 
 }
