@@ -2,7 +2,6 @@ package com.divyapankajananda.mimiapi.controller.v1;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.divyapankajananda.mimiapi.dto.BudgetRequestDto;
+import com.divyapankajananda.mimiapi.dto.CustomExceptionDto;
 import com.divyapankajananda.mimiapi.entity.Budget;
-import com.divyapankajananda.mimiapi.exception.ForbiddenActionException;
-import com.divyapankajananda.mimiapi.exception.ResourceNotFoundException;
 import com.divyapankajananda.mimiapi.service.BudgetService;
+import com.divyapankajananda.mimiapi.util.Constants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("mimiapi/v1/budget")
+@RequestMapping(Constants.API_V1_PREFIX+"budget")
+@Tag(name = "Budget")
 public class BudgetController {
 
     @Autowired
@@ -39,87 +45,56 @@ public class BudgetController {
     private AuditorAware<UUID> auditor;
 
     @PostMapping("/")
-    public ResponseEntity<Object> saveBudget(@RequestBody @Valid BudgetRequestDto budgetRequestDto) throws ForbiddenActionException {
-        LocalDate startDate = budgetRequestDto.getStartDate();
-        LocalDate endDate = budgetRequestDto.getEndDate();
-        UUID currentUserId = auditor.getCurrentAuditor().get();
+    @Operation(summary = "Save budget.")
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Budget.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> saveUserBudget(@RequestBody @Valid BudgetRequestDto budgetRequestDto) {
+        Budget budget = budgetService.saveUserBudget(budgetRequestDto);
 
-        Optional<List<Budget>> overlappingBudgets = budgetService.findAllOverlappingUserBudgets(startDate, endDate, currentUserId);
-
-        if (overlappingBudgets.isPresent() && overlappingBudgets.get().size() > 0) {
-            throw new ForbiddenActionException(
-                    String.format("Overlapping budgets present between %s and %s", startDate, endDate));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(budgetService.saveBudget(budgetRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(budget);
     }
 
     @GetMapping("/")
-    public ResponseEntity<Object> findAllBudgetsBetweenStartAndEndDate(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws ResourceNotFoundException {
-
+    @Operation(summary = "Get all budgets between provided start date and end date.")
+    @ApiResponse(responseCode = "200", description = "Successful response", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Budget.class))))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> findAllUserBudgetsBetweenStartAndEndDate(@RequestParam @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         UUID currentUserId = auditor.getCurrentAuditor().get();
-        Optional<List<Budget>> budgets = budgetService.findAllUserBudgetsBetweenStartAndEndDate(startDate, endDate,
-                currentUserId);
-
-        if(!budgets.isPresent() || budgets.get().size()<=0){
-            throw new ResourceNotFoundException("No budget found");
-        }
+        List<Budget> budgets = budgetService.findAllUserBudgetsBetweenStartAndEndDate(startDate, endDate, currentUserId);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(budgets.get());
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<Object> findAllBudgets() throws ResourceNotFoundException {
-
-        UUID currentUserId = auditor.getCurrentAuditor().get();
-        Optional<List<Budget>> budgets = budgetService.findAllUserBudgets(currentUserId);
-
-        if(!budgets.isPresent() || budgets.get().size()<=0){
-            throw new ResourceNotFoundException("No budget found");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(budgets.get());
+                .body(budgets);
     }
 
     @PutMapping("/{budgetid}")
-    public ResponseEntity<Object> updateBudget(@PathVariable UUID budgetid, @RequestBody @Valid BudgetRequestDto budgetRequestDto) throws ForbiddenActionException, ResourceNotFoundException {
-       
-        UUID currentUserId = auditor.getCurrentAuditor().get();
-        Optional<Budget> budget = budgetService.findBudget(budgetid);
-
-        if (!budget.isPresent()) {
-            throw new ResourceNotFoundException("Budget not found");
-        }
-
-        if (!budget.get().getUserId().equals(currentUserId)) {
-            throw new ForbiddenActionException("Budget is not created by current user *****"+budget.get().getUserId()+"*********"+currentUserId);
-        }
-        Budget updatedBudget = budgetService.updateBudget(budgetid, budgetRequestDto);
+    @Operation(summary = "Update budget.")
+    @ApiResponse(responseCode = "200", description = "Successful response", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Budget.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> updateUserBudget(@PathVariable("budgetid") @Valid UUID budgetId, @RequestBody @Valid BudgetRequestDto budgetRequestDto) {
+        Budget updatedBudget = budgetService.updateUserBudget(budgetId, budgetRequestDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(updatedBudget);
     }
 
     @DeleteMapping("/{budgetid}")
-    public ResponseEntity<Object> deleteBudget(@PathVariable UUID budgetid)
-            throws ResourceNotFoundException, ForbiddenActionException {
+    @Operation(summary = "Delete budget.")
+    @ApiResponse(responseCode = "204", description = "Success,No content", content = @Content())
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> deleteUserBudget(@PathVariable("budgetid") UUID budgetId) {
         UUID currentUserId = auditor.getCurrentAuditor().get();
 
-        Optional<Budget> budget = budgetService.findBudget(budgetid);
+        budgetService.deleteUserBudget(currentUserId, budgetId);
 
-        if (!budget.isPresent()) {
-            throw new ResourceNotFoundException("Budget not found");
-        }
-
-        if (!budget.get().getUserId().equals(currentUserId)) {
-            throw new ForbiddenActionException("Budget is not created by current user");
-        }
-
-        budgetService.deleteBudget(budgetid);
-
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(null);
     }
 }

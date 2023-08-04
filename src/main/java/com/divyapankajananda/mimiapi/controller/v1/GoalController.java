@@ -1,6 +1,5 @@
 package com.divyapankajananda.mimiapi.controller.v1;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +17,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.divyapankajananda.mimiapi.dto.CustomExceptionDto;
 import com.divyapankajananda.mimiapi.dto.GoalRequestDto;
 import com.divyapankajananda.mimiapi.entity.Goal;
-import com.divyapankajananda.mimiapi.exception.ResourceNotFoundException;
 import com.divyapankajananda.mimiapi.service.GoalService;
+import com.divyapankajananda.mimiapi.util.Constants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("mimiapi/v1/goal")
+@RequestMapping(Constants.API_V1_PREFIX+"goal")
+@Tag(name = "Goal")
 public class GoalController {
 
     @Autowired
@@ -36,14 +43,24 @@ public class GoalController {
     private AuditorAware<UUID> auditor;
 
     @PostMapping("/")
-    public ResponseEntity<Object> saveGoal(@RequestBody @Valid GoalRequestDto goalRequestDto) {
-        Goal goal = goalService.saveGoal(goalRequestDto);
+    @Operation(summary = "Save goal.")
+    @ApiResponse(responseCode = "201", description = "Created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Goal.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> saveUserGoal(@RequestBody @Valid GoalRequestDto goalRequestDto) {
+        Goal goal = goalService.saveUserGoal(goalRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(goal);
     }
 
     @GetMapping("/")
-    public ResponseEntity<Object> findAllUserGoals(@RequestParam int offset,@RequestParam int size) {
+    @Operation(summary = "Get all user goals.")
+    @ApiResponse(responseCode = "200", description = "Successful response", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Goal.class))))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> findAllUserGoals(@RequestParam @Valid int offset,@RequestParam @Valid int size) {
         UUID currentUserId = auditor.getCurrentAuditor().get();
 
         Page<Goal> goals = goalService.findAllUserGoalsWithPagination(currentUserId,offset,size);
@@ -52,28 +69,31 @@ public class GoalController {
                 .body(goals);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> updateGoal(@PathVariable UUID id, @RequestBody @Valid GoalRequestDto goalRequestDto) throws ResourceNotFoundException {
-        Optional<Goal> existing_goal = goalService.findGoalById(id);
-
-        if(existing_goal.isPresent()){
-            Goal goal = goalService.updateGoal(id,goalRequestDto);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(goal);
-        }else
-            throw new ResourceNotFoundException(String.format("Goal with %s doesn't exist.",id));
+    @PutMapping("/{goalid}")
+    @Operation(summary = "Update goal.")
+    @ApiResponse(responseCode = "200", description = "Successful response", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Goal.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> updateUserGoal(@PathVariable("goalid") @Valid UUID goalId, @RequestBody @Valid GoalRequestDto goalRequestDto) {
+        UUID currentUserId = auditor.getCurrentAuditor().get();
+        Goal goal = goalService.updateUserGoal(currentUserId, goalId,goalRequestDto);
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(goal);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteGoal(@PathVariable UUID id) throws ResourceNotFoundException {
-        Optional<Goal> existing_goal = goalService.findGoalById(id);
-
-        if(existing_goal.isPresent()){
-            goalService.deleteGoal(id);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(null);
-        }else
-            throw new ResourceNotFoundException(String.format("Goal with %s doesn't exist.",id));
-
+    @DeleteMapping("/{goalid}")
+    @Operation(summary = "Delete goal.")
+    @ApiResponse(responseCode = "204", description = "Success,No content", content = @Content())
+    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CustomExceptionDto.class)))
+    public ResponseEntity<Object> deleteUserGoal(@PathVariable("goalid") UUID goalId) {
+        UUID currentUserId = auditor.getCurrentAuditor().get();
+        goalService.deleteUserGoal(currentUserId, goalId);
+        
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(null);
     }
 }
