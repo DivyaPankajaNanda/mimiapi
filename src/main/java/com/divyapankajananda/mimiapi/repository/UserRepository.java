@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.divyapankajananda.mimiapi.entity.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByUsername(String username);
+    public Optional<User> findByUsername(String username);
 
-    Boolean existsByUsername(String username);
+    public Boolean existsByUsername(String username);
+
+    public Optional<User> findByUserId(UUID currentUserId);
 }
