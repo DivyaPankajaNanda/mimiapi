@@ -2,8 +2,6 @@ package com.divyapankajananda.mimiapi.dto;
 
 import java.util.UUID;
 
-import com.divyapankajananda.mimiapi.entity.TransactionType;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransactionRequestDto {
+public class TransactionUpdateRequestDto {
     
     @NotBlank(message = "Invalid Payment title")
     private String title;
@@ -34,12 +32,6 @@ public class TransactionRequestDto {
     @NotNull
     private UUID categoryId;
 
-    @NotNull
-    private UUID budgetId;
-    
-    @NotNull
-    private TransactionType type;
-    
     @Min(value = 0, message = "Happiness quotient range must be between 0 to 10")
     @Max(value = 10, message = "Happiness quotient range must be between 0 to 10")
     private Integer happinessQuotient;

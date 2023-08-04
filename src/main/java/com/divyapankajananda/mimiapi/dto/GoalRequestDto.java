@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.divyapankajananda.mimiapi.entity.TransactionType;
+import com.divyapankajananda.mimiapi.util.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -37,15 +39,18 @@ public class GoalRequestDto {
     private UUID categoryId;
     
     @NotNull(message = "Choose a valid type")
-    private String type;
+    private TransactionType type;
     
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd") 
-    @JsonFormat(pattern = "yyyy-MM-dd") 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = Constants.DATE_PATTERN) 
+    @JsonFormat(pattern = Constants.DATE_PATTERN)
+    @NotNull
     private LocalDate startDate;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd") 
-    @JsonFormat(pattern = "yyyy-MM-dd") 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = Constants.DATE_PATTERN) 
+    @JsonFormat(pattern = Constants.DATE_PATTERN)
+    @NotNull
     private LocalDate endDate;
 
-    private boolean completed;
+    private boolean isClaimed;
+
 }
